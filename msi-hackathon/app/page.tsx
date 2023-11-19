@@ -4,6 +4,7 @@ import Sidebar from './sidebar';
 import { Computer, Player, question, videogame } from '@/types';
 import ComputerField from './computer_field';
 import CustomQuestionDialog from './custom_question';
+import get_time, { MULTIPLIER } from './get_time';
 
 const NUM_COMPUTERS = 24;
 
@@ -14,7 +15,16 @@ export default function Home() {
   const [queue, setQueue] = useState<Player[]>([]);
   const [questions,setQuestions] = useState<question[]>([]);
   const [minimum_time, setMinimumTime] = useState<number>(25_000);
-  const [videogame_list, setVideogameList] = useState<videogame[]>([{name: "Overwatch", leadout_time:15_000},{name: "League of Legends", leadout_time:600_000},{name: "Valorant", leadout_time:600_000},{name: "Fortnite", leadout_time:600_000},{name: "Hearthstone", leadout_time:600_000},{name: "Apex Legends", leadout_time:600_000},{name: "Rocket League", leadout_time:600_000},{name: "Other", leadout_time:600_000}]);
+  const [videogame_list, setVideogameList] = useState<videogame[]>([
+    {name: "Overwatch", leadout_time:10*60_000},
+    {name: "League of Legends", leadout_time:20*60_000},
+    {name: "Valorant", leadout_time:17*60_000},
+    {name: "Fortnite", leadout_time:10*60_000},
+    {name: "Hearthstone", leadout_time:4*60_000},
+    {name: "Apex Legends", leadout_time:8*60_000},
+    {name: "Rocket League", leadout_time:15*60_000},
+    {name: "Other", leadout_time:10*60_000}
+  ]);
   const [questionFadingOut, setQuestionFadingOut] = useState<boolean>(false);
   const [lastGameWarnings, setLastGameWarnings] = useState<(number | null)[]>(Array(NUM_COMPUTERS).fill(null))
 
@@ -40,7 +50,7 @@ export default function Home() {
 
 
   function force_add_player(to_add: Player, computer_number: number) {
-      to_add.play_start_time = new Date().getTime();
+      to_add.play_start_time = get_time();
       let new_computers = computers.slice();
       new_computers[computer_number].curr_player = to_add;
       setComputers(new_computers);
@@ -56,7 +66,7 @@ export default function Home() {
     }
     let to_add: Player = {
       play_start_time: null,
-      queue_start_time: new Date().getTime(),
+      queue_start_time: get_time(),
       computer_number: computer_number,
       videogame: videogame!,
       ID: ID,
@@ -96,14 +106,14 @@ export default function Home() {
             let computer_player: Player = computers[computer_number].curr_player!;
             let to_add: Player = {
               play_start_time: null,
-              queue_start_time: new Date().getTime(),
+              queue_start_time: get_time(),
               computer_number: computer_number,
               videogame: computer_player.videogame,
               ID: computer_player.ID,
             };
             new_queue.push(to_add);
             queue_player.computer_number = computer_number;
-            queue_player.play_start_time = new Date().getTime();
+            queue_player.play_start_time = get_time();
             new_computers[computer_number].curr_player = queue_player;
             setQueue(new_queue);
             check_queue_alert()
@@ -118,7 +128,7 @@ export default function Home() {
     }
   }
   function timeLeft(comp:Computer):number {
-    let time_playing = new Date().getTime() - comp.curr_player!.play_start_time!;
+    let time_playing = get_time() - comp.curr_player!.play_start_time!;
     let time_to_get_off = minimum_time - comp.curr_player!.videogame.leadout_time;
     return time_to_get_off-time_playing;
   }
@@ -141,7 +151,7 @@ export default function Home() {
             let new_computers = computers.slice();
             let player: Player = remove_player_from_queue(0);
             player.computer_number = computer_number;
-            player.play_start_time = new Date().getTime();
+            player.play_start_time = get_time();
             new_computers[computer_number].curr_player = player;
             setComputers(new_computers);
           },()=>{}]
@@ -166,7 +176,7 @@ export default function Home() {
     let new_computers = computers.slice();
     let player: Player = remove_player_from_queue(0);
     player.computer_number = computer_number;
-    player.play_start_time = new Date().getTime();
+    player.play_start_time = get_time();
     new_computers[computer_number].curr_player = player;
     setComputers(new_computers);
     return true;
@@ -221,14 +231,14 @@ export default function Home() {
     let num_over = 0;
     for(let i = 0; i<computers.length; i++) {
       if(computers[i].curr_player == null) continue;
-      let time_playing = new Date().getTime() - computers[i].curr_player!.play_start_time!;
+      let time_playing = get_time() - computers[i].curr_player!.play_start_time!;
       let time_to_get_off = minimum_time - computers[i].curr_player!.videogame.leadout_time;
       if(time_playing>time_to_get_off) num_over ++;
     }
     if(queue.length > num_over) {
       for(let i = 0; i<computers.length; i++) {
         if(computers[i].curr_player == null) continue;
-        let time_playing = new Date().getTime() - computers[i].curr_player!.play_start_time!;
+        let time_playing = get_time() - computers[i].curr_player!.play_start_time!;
         let time_to_get_off = minimum_time - computers[i].curr_player!.videogame.leadout_time;
         if(time_to_get_off>=time_playing && time_playing>=time_to_get_off-1000) {
           make_alert("Tell Player "+computers[i].curr_player!.ID+" on computer "+computers[i].name+" its their last game");
@@ -237,7 +247,7 @@ export default function Home() {
     }
   }
 
-  setInterval(update_warnings,1000)
+  setInterval(update_warnings,1000/MULTIPLIER)
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">

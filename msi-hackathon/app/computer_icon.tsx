@@ -4,6 +4,7 @@ import remove from '../images/close.png';
 import React, { useState } from 'react';
 import computer_icon from '../images/computer.png';
 import { ComputerIconProps } from './props';
+import get_time, { MULTIPLIER } from './get_time';
 export default function ComputerIcon({index, computer,remove_player_from_computer,move_player_from_computer_to_queue,make_alert,minimum_time}:ComputerIconProps) {
     const [hovering, setHovering] = useState<boolean>(false);
     const [timeElapsed, setTimeElapsed] = useState<number>(0); // in milliseconds
@@ -11,10 +12,10 @@ export default function ComputerIcon({index, computer,remove_player_from_compute
         if(computer.curr_player == null) {
             setTimeElapsed(0);
         } else {
-            setTimeElapsed(new Date().getTime()-computer.curr_player!.play_start_time!);
+            setTimeElapsed(get_time()-computer.curr_player!.play_start_time!);
         }
     }
-    setInterval(updateTimeLeft,1000);
+    setInterval(updateTimeLeft,1000/MULTIPLIER);
     function secondsToTimerString(ms:number):string {
         let hours = (Math.abs(ms/3600_000-0.5)).toFixed(0);
         ms %= 3600_000

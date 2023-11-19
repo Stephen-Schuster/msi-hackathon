@@ -28,7 +28,6 @@ export default function AddPlayerForm({add_player,default_computer_name,computer
                             {videogame_list.map((vg) => 
                                 <option value={vg.name}>{vg.name}</option>
                             )}
-                            <option value={"Other"}>Other</option>
                         </select>
                     </label><br/>
                     <label>Computer:<br/>
