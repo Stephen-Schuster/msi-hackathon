@@ -34,6 +34,14 @@ export default function Home() {
     return computers;
   }
 
+
+  function force_add_player(to_add: Player, computer_number: number) {
+      to_add.play_start_time = new Date().getTime();
+      let new_computers = computers.slice();
+      new_computers[computer_number].curr_player = to_add;
+      setComputers(new_computers);
+  }
+
   function add_player(ID: string, videogame: string = "Other", computer_number: number | null = null) {
     let to_add: Player = {
       play_start_time: null,
@@ -43,16 +51,16 @@ export default function Home() {
       ID: ID
     };
     if (computer_number != null) {
-      if (computers[computer_number].curr_player == null ||
-        confirm(
-          "Someone is already playing on Computer " +
+      if (computers[computer_number].curr_player == null) {
+        force_add_player(to_add,computer_number)
+      } else {
+        add_question({
+          message: "Someone is already playing on Computer " +
           computers[computer_number].name +
-          ". Are you sure you want to kick off the current player?"
-        )) {
-        to_add.play_start_time = new Date().getTime();
-        let new_computers = computers.slice();
-        new_computers[computer_number].curr_player = to_add;
-        setComputers(new_computers);
+          ". Are you sure you want to kick off the current player?",
+          options: ['Yes','No'],
+          callbacks: [()=>force_add_player(to_add,computer_number),()=>{}]
+        });
       }
     } else {
       console.log(to_add);
