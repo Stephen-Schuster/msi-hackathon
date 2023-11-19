@@ -42,18 +42,16 @@ header {
 
 nav, section {
   float: left;
+  height: 80vh;
 }
 
 nav {
   width: 20vw;
-  height: 100vh;
   margin-right: 10px;
 }
 
 section {
   width: 50vw;
-  height: 100vh;
-  background-color: black;
 }
 
 *, *:before, *:after {
@@ -82,23 +80,18 @@ header {
   padding: 20px 0;
 }
 
-img {
-  border-radius: 20px;
-}
 
 /* nav, section {
   padding: 200px 0;
 } */
 
 .add_player_form {
-  min-height: 40vh;
   width: 100%;
   border-color: crimson;
   border-width: 5px;
   border-radius: 20px;
 }
 .player_queue {
-  min-height: 60vh;
   width: 100%;
   border-color: aqua;
   border-width: 5px;
@@ -118,4 +111,68 @@ button {
   border-width: 3px;
   border-radius: 5px;
   min-width: 2vw;
+}
+.computer {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  max-width: 10%;
+}
+.computer_field {
+  position: relative;
+}
+.computer_name_container {
+  position: absolute;
+  border-color: transparent;
+  border-width: 5px;
+  text-align: center;
+  width: 3.5vw;
+  height: 4vw;
+  transform: translate(-1vw,-1.8vw);
+}
+.computer_name {
+  color: navy;
+  font-size: 1vw;
+}
+.computer_player_info_container {
+  position: absolute;
+  text-align: center;
+  background-color: blue;
+  border-radius: 1vh;
+  padding-left: 3px;
+  padding-right: 3px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  transform: translate(-50%,75%);
+}
+.computer_player_info {
+  font-size: 0.7vw;
+  color: white;
+}
+.remove {
+  position: absolute;
+  transform: translate(100%,-150%);
+  font-size: 0.5vw;
+  height: 1.5vw;
+  width: 1.5vw;
+  min-width: 0;
+  background-color: white;
+  padding: 0.2vh;
+}
+.requeue {
+  position: absolute;
+  transform: translate(100%,0%);
+  font-size: 0.5vw;
+  height: 1.5vw;
+  width: 1.5vw;
+  min-width: 0;
+  background-color: white;
+  padding: 0.2vh;
+}
+.requeue img {
+  max-width: 100%;
+  max-height: 100%;
+}
+.remove img {
+  max-width: 100%;
+  max-height: 100%;
 }

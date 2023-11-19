@@ -28,3 +28,14 @@ export type PlayerInQueueProps = {
     player: Player;
     remove_player_from_queue: Function;
 }
+export type ComputerFieldProps = {
+    computers:Computer[];
+    remove_player_from_computer: Function;
+    move_player_from_computer_to_queue: Function;
+}
+export type ComputerIconProps = {
+    computer:Computer;
+    remove_player_from_computer: Function;
+    move_player_from_computer_to_queue: Function;
+    index: number;
+}

@@ -1,6 +1,6 @@
 import { AddPlayerFormProps } from './props';
 
-const videogame_list = ["Overwatch","League of Legends","Valorant"]
+const videogame_list = ["Overwatch","League of Legends","Valorant","Fortnite","Hearthstone","Apex Legends","Rocket League"]
 
 import React, { useState } from 'react';
 export default function AddPlayerForm({add_player,default_computer_name,computer_name_to_index,computer_names}:AddPlayerFormProps) {

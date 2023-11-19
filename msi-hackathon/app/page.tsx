@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from 'react';
-import layout from '../images/tec_layout.png';
 import Sidebar from './sidebar';
 import { Computer, Player } from '@/types';
+import ComputerField from './computer_field';
 
 const NUM_COMPUTERS = 24;
 
@@ -14,15 +14,18 @@ export default function Home() {
   function default_computer_list(): Computer[] {
     let computers = [];
     for (let i = 0; i < NUM_COMPUTERS; i++) {
-      let name = i.toString();
-      if (i < 5) name = "A" + (i + 1);
-      else if (i < 10) name = "B" + (i + 1 - 5);
-      else if (i < 15) name = "C" + (i + 1 - 10);
-      else if (i < 20) name = "D" + (i + 1 - 15);
-      else if (i < 24) name = "E" + (i + 1 - 20);
+      let name = String.fromCharCode(65 + Math.floor(i/5))+(i%5+1);
+      let x = 100.0/8 * (i%5+1);
+      let y = 100 - 100.0/5 * (Math.floor(i/5)+1);
+      if(i>=20) {
+        x = 100.0*7/8;
+        y = 100.0/5 * (i-19);
+      }
       computers.push({
         curr_player: null,
-        name: name
+        name,
+        x,
+        y,
       })
     }
     return computers;
@@ -44,7 +47,9 @@ export default function Home() {
           ". Are you sure you want to kick off the current player?"
         )) {
         to_add.play_start_time = new Date().getTime();
-        computers[computer_number].curr_player = to_add;
+        let new_computers = computers.slice();
+        new_computers[computer_number].curr_player = to_add;
+        setComputers(new_computers);
       }
     } else {
       console.log(to_add);
@@ -58,10 +63,17 @@ export default function Home() {
       alert("No Player there!");
     } else {
       let player: Player = computers[computer_number].curr_player!;
+      remove_player_from_computer(computer_number);
+      add_player(player.ID, player.videogame);
+    }
+  }
+  function remove_player_from_computer(computer_number: number) {
+    if (computers[computer_number].curr_player == null) {
+      alert("No Player there!");
+    } else {
       let new_computers = computers.slice();
       new_computers[computer_number].curr_player = null;
       setComputers(new_computers);
-      add_player(player.ID, player.videogame);
     }
   }
   function available_computer(): number | null {
@@ -111,7 +123,7 @@ export default function Home() {
     return to_return;
   }
 
-  console.log(queue)
+  console.log(computers)
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
       <div className="wrapper">
@@ -120,7 +132,7 @@ export default function Home() {
           <Sidebar add_player={add_player} queue={queue} pop_player_from_queue={pop_player_from_queue} default_computer_name={default_computer_name} computer_name_to_index={computer_name_to_index} computer_names={computer_names} remove_player_from_queue={remove_player_from_queue}/>
         </nav>
         <section>
-          <img src={layout.src} alt="layout"></img>
+          <ComputerField computers={computers} remove_player_from_computer={remove_player_from_computer} move_player_from_computer_to_queue={move_player_from_computer_to_queue}/>
         </section>
       </div>
     </main>
