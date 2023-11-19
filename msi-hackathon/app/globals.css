@@ -107,10 +107,15 @@ img {
 input, option, select {
   background-color: white;
   color: black;
-  width: 80%;
   text-align: center;
 }
 .errorMessage {
   color: crimson;
   font-weight: bolder;
+}
+button {
+  border-color: crimson;
+  border-width: 3px;
+  border-radius: 5px;
+  min-width: 2vw;
 }

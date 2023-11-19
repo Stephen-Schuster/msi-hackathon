@@ -74,15 +74,41 @@ export default function Home() {
     let available = available_computer();
     if (available == null || queue.length == 0) return false;
     let computer_number: number = available!;
-    let new_queue = queue.slice()
     let new_computers = computers.slice();
-    let player: Player = new_queue.splice(0, 1)[0]
+    let player: Player = remove_player_from_queue(0);
     player.computer_number = computer_number;
     player.play_start_time = new Date().getTime();
     new_computers[computer_number].curr_player = player;
     setComputers(new_computers);
-    setQueue(new_queue);
     return true;
+  }
+  function computer_name_to_index(name: string): number | null {
+    if (name == "Queue") return null;
+    for (let i = 0; i < computers.length; i++) {
+      if (computers[i].name == name) return i;
+    }
+    throw Error("name does not exist")
+  }
+  function default_computer_name(): string {
+    let names = computer_names();
+    if (names.length > 1) {
+      return names[1]!;
+    } else {
+      return "Queue";
+    }
+  }
+  function computer_names(): string[] {
+    let to_return: string[] = ["Queue"];
+    for (let i = 0; i < computers.length; i++) {
+      if (computers[i].curr_player == null) to_return.push(computers[i].name);
+    }
+    return to_return
+  }
+  function remove_player_from_queue(index:number): Player {
+    let new_queue = queue.slice();
+    let to_return = new_queue.splice(index,1)[0]
+    setQueue(new_queue);
+    return to_return;
   }
 
   console.log(queue)
@@ -91,7 +117,7 @@ export default function Home() {
       <div className="wrapper">
         <header>HEADER</header>
         <nav>
-          <Sidebar add_player={add_player} available_computer={available_computer} computers={computers} queue={queue}/>
+          <Sidebar add_player={add_player} queue={queue} pop_player_from_queue={pop_player_from_queue} default_computer_name={default_computer_name} computer_name_to_index={computer_name_to_index} computer_names={computer_names} remove_player_from_queue={remove_player_from_queue}/>
         </nav>
         <section>
           <img src={layout.src} alt="layout"></img>
