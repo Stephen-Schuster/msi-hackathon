@@ -4,28 +4,36 @@ import React, { useState } from 'react';
 interface CustomQuestionDialogProps {
   q: question;
   open: boolean;
-  onClose1: () => void;
-  onClose2: () => void;
+  setQuestionFadingOut: Function;
+  questions: question[];
+  setQuestions: Function;
 }
 
-const CustomQuestionDialog: React.FC<CustomQuestionDialogProps> = ({ q, open, onClose1, onClose2 }) => {
+const CustomQuestionDialog: React.FC<CustomQuestionDialogProps> = ({ q, open, setQuestionFadingOut, questions, setQuestions }) => {
   const [fade, setFade] = useState(false);
 
   React.useEffect(() => {
     if (open) {
       setFade(true);
     }
-    else if (!open && fade) {
-      setFade(false);
-      onClose1()
-    }
-  }, [open, fade, onClose1]);
+  }, [open]);
 
   const handleClick = (idx:number) => {
     q.callbacks[idx]();
-    onClose1()
     setFade(false);
-    setTimeout(onClose2,500);
+    setQuestionFadingOut(true);
+    setTimeout(()=>{
+      console.log(questions);
+      setQuestionFadingOut(false);
+      if(questions.length > 1) {
+        let new_questions = questions.slice(1);
+        console.log(new_questions)
+        setQuestions(new_questions);
+      } else {
+        console.log("nothing")
+        setQuestions([])
+      }
+    },500);
   }
 
   return (

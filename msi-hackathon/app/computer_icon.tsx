@@ -4,8 +4,7 @@ import remove from '../images/close.png';
 import React, { useState } from 'react';
 import computer_icon from '../images/computer.png';
 import { ComputerIconProps } from './props';
-const MINIMUM_TIME = 3600_000;
-export default function ComputerIcon({index, computer,remove_player_from_computer,move_player_from_computer_to_queue}:ComputerIconProps) {
+export default function ComputerIcon({index, computer,remove_player_from_computer,move_player_from_computer_to_queue,make_alert,minimum_time}:ComputerIconProps) {
     const [hovering, setHovering] = useState<boolean>(false);
     const [timeElapsed, setTimeElapsed] = useState<number>(0); // in milliseconds
     function updateTimeLeft() {
@@ -17,11 +16,11 @@ export default function ComputerIcon({index, computer,remove_player_from_compute
     }
     setInterval(updateTimeLeft,1000);
     function secondsToTimerString(ms:number):string {
-        let hours = (ms/3600_000).toFixed(0);
+        let hours = (Math.abs(ms/3600_000-0.5)).toFixed(0);
         ms %= 3600_000
-        let minutes = (ms/60_000).toFixed(0);
+        let minutes = (Math.abs(ms/60_000-0.5)).toFixed(0);
         ms %= 60_000
-        let seconds = (ms/1000).toFixed(0);
+        let seconds = (Math.abs(ms/1000-0.5)).toFixed(0);
         while(minutes.length < 2) minutes = "0"+minutes;
         while(seconds.length < 2) seconds = "0"+seconds;
         let to_return = hours+":"+minutes+":"+seconds;
@@ -36,7 +35,7 @@ export default function ComputerIcon({index, computer,remove_player_from_compute
             {
                 computer.curr_player == null?<></>:
                 <>
-                    <div className='computer_player_info_container' style={{backgroundColor:'hsl('+(120/MINIMUM_TIME*(MINIMUM_TIME-Math.min(timeElapsed,MINIMUM_TIME)))+',70%,50%)',left:computer.x+"%",top:computer.y+"%"}}>
+                    <div className='computer_player_info_container' style={{backgroundColor:'hsl('+(120/minimum_time*(minimum_time-Math.min(timeElapsed,minimum_time)))+',70%,50%)',left:computer.x+"%",top:computer.y+"%"}}>
                         <h2 className='computer_player_info'>
                             {computer.curr_player!.ID}<br/>
                             {secondsToTimerString(timeElapsed)}

@@ -1,4 +1,4 @@
-import { Computer, Player } from "@/types";
+import { Computer, Player, videogame } from "@/types";
 
 export type AddPlayerFormProps = {
     add_player:Function;
@@ -7,6 +7,7 @@ export type AddPlayerFormProps = {
     computers: Computer[];
     nextComputerName: string;
     setNextComputerName: Function;
+    videogame_list: videogame[];
 }
 export type SidebarProps = {
     add_player:Function;
@@ -19,6 +20,7 @@ export type SidebarProps = {
     computers: Computer[];
     nextComputerName: string;
     setNextComputerName: Function;
+    videogame_list: videogame[];
 }
 export type PlayerQueueProps = {
     queue: Player[];
@@ -37,13 +39,17 @@ export type PlayerInQueueProps = {
     remove_player_from_queue: Function;
 }
 export type ComputerFieldProps = {
+    minimum_time:number;
     computers:Computer[];
     remove_player_from_computer: Function;
     move_player_from_computer_to_queue: Function;
+    make_alert: Function
 }
 export type ComputerIconProps = {
+    minimum_time:number;
     computer:Computer;
     remove_player_from_computer: Function;
     move_player_from_computer_to_queue: Function;
     index: number;
+    make_alert: Function
 }

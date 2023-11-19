@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import Sidebar from './sidebar';
-import { Computer, Player, question } from '@/types';
+import { Computer, Player, question, videogame } from '@/types';
 import ComputerField from './computer_field';
 import CustomQuestionDialog from './custom_question';
 
@@ -13,7 +13,10 @@ export default function Home() {
   const [next_computer_name, setNextComputerName] = useState<string>(default_computer_name());
   const [queue, setQueue] = useState<Player[]>([]);
   const [questions,setQuestions] = useState<question[]>([]);
-  const [curr_question,setCurrQuestion] = useState<question|undefined>(undefined);
+  const [minimum_time, setMinimumTime] = useState<number>(25_000);
+  const [videogame_list, setVideogameList] = useState<videogame[]>([{name: "Overwatch", leadout_time:15_000},{name: "League of Legends", leadout_time:600_000},{name: "Valorant", leadout_time:600_000},{name: "Fortnite", leadout_time:600_000},{name: "Hearthstone", leadout_time:600_000},{name: "Apex Legends", leadout_time:600_000},{name: "Rocket League", leadout_time:600_000},{name: "Other", leadout_time:600_000}]);
+  const [questionFadingOut, setQuestionFadingOut] = useState<boolean>(false);
+  const [lastGameWarnings, setLastGameWarnings] = useState<(number | null)[]>(Array(NUM_COMPUTERS).fill(null))
 
   function default_computer_list(): Computer[] {
     let computers = [];
@@ -43,13 +46,20 @@ export default function Home() {
       setComputers(new_computers);
   }
 
-  function add_player(ID: string, videogame: string = "Other", computer_number: number | null = null) {
+  function add_player(ID: string, videogame_name: string="Other", computer_number: number | null = null) {
+    let videogame = null;
+    for(let i = 0;i<videogame_list.length; i++) {
+      if(videogame_list[i].name == videogame_name) {
+        videogame = videogame_list[i];
+        break;
+      }
+    }
     let to_add: Player = {
       play_start_time: null,
       queue_start_time: new Date().getTime(),
       computer_number: computer_number,
-      videogame: videogame,
-      ID: ID
+      videogame: videogame!,
+      ID: ID,
     };
     if (computer_number != null) {
       if (computers[computer_number].curr_player == null) {
@@ -88,7 +98,7 @@ export default function Home() {
               queue_start_time: new Date().getTime(),
               computer_number: computer_number,
               videogame: computer_player.videogame,
-              ID: computer_player.ID
+              ID: computer_player.ID,
             };
             new_queue.push(to_add);
             queue_player.computer_number = computer_number;
@@ -101,7 +111,7 @@ export default function Home() {
       } else {
         let player: Player = computers[computer_number].curr_player!;
         remove_player_from_computer(computer_number);
-        add_player(player.ID, player.videogame);
+        add_player(player.ID, player.videogame.name);
       }
     }
   }
@@ -175,30 +185,22 @@ export default function Home() {
     setQueue(new_queue);
     return to_return;
   }
-  function close2_question() {
-    let new_questions = questions.slice(1);
-    setQuestions(new_questions);
-  }
-  function close1_question() {
-    setCurrQuestion(questions[1]);
-  }
   function add_question(q:question) {
       let new_new_questions = questions.slice();
       new_new_questions.push(q);
       setQuestions(new_new_questions);
-      if(new_new_questions.length == 1) setCurrQuestion(new_new_questions[0]);
   }
   function snooze_alert(message:string) {
     setTimeout(() =>{
-      add_question(make_alert(message))
+      make_alert(message);
     },10_000);
   }
-  function make_alert(message: string):question {
-    return {
+  function make_alert(message: string) {
+    add_question({
       message,
       options: ['Snooze 60s','OK'],
       callbacks: [()=>snooze_alert(message),()=>{}]
-    }
+    });
   }
 
   return (
@@ -206,20 +208,21 @@ export default function Home() {
       <div className="wrapper">
         <CustomQuestionDialog
           q={questions[0]}
-          open={questions.length > 0 && questions[0] == curr_question}
-          onClose1={close1_question}
-          onClose2={close2_question}
+          open={questions.length > 0 && !questionFadingOut}
+          setQuestionFadingOut={setQuestionFadingOut}
+          questions={questions}
+          setQuestions={setQuestions}
         />
         <header className='sub_section'>
-          <div>
-            <button onClick={() => {add_question(make_alert('TEST'))}}><p>Test Question</p></button>
+         <div>
+            <button onClick={() => {make_alert('TEST')}}><p>Test Question</p></button>
           </div>
         </header>
         <nav>
-          <Sidebar computers={computers} add_player={add_player} queue={queue} pop_player_from_queue={pop_player_from_queue} default_computer_name={default_computer_name} computer_name_to_index={computer_name_to_index} computer_names={computer_names} remove_player_from_queue={remove_player_from_queue} setNextComputerName={setNextComputerName} nextComputerName={next_computer_name}/>
+          <Sidebar computers={computers} add_player={add_player} queue={queue} pop_player_from_queue={pop_player_from_queue} default_computer_name={default_computer_name} computer_name_to_index={computer_name_to_index} computer_names={computer_names} remove_player_from_queue={remove_player_from_queue} setNextComputerName={setNextComputerName} nextComputerName={next_computer_name} videogame_list={videogame_list}/>
         </nav>
         <section>
-          <ComputerField computers={computers} remove_player_from_computer={remove_player_from_computer} move_player_from_computer_to_queue={move_player_from_computer_to_queue}/>
+          <ComputerField computers={computers} remove_player_from_computer={remove_player_from_computer} move_player_from_computer_to_queue={move_player_from_computer_to_queue} make_alert={make_alert} minimum_time={minimum_time}/>
         </section>
       </div>
     </main>

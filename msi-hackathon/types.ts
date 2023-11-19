@@ -8,11 +8,15 @@ export type Player = {
     play_start_time: number | null;
     queue_start_time: number;
     computer_number: number | null;
-    videogame: string;
+    videogame: videogame;
     ID: string;
 }
 export type question = {
     message: string;
     options: string[];
     callbacks: Function[];
+}
+export type videogame = {
+    name: string;
+    leadout_time: number;
 }

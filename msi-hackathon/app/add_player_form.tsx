@@ -1,17 +1,15 @@
 import { Computer } from '@/types';
 import { AddPlayerFormProps } from './props';
 
-const videogame_list = ["Overwatch","League of Legends","Valorant","Fortnite","Hearthstone","Apex Legends","Rocket League"]
-
 import React, { useState } from 'react';
-export default function AddPlayerForm({add_player,default_computer_name,computer_name_to_index,computers,nextComputerName,setNextComputerName}:AddPlayerFormProps) {
+export default function AddPlayerForm({add_player,default_computer_name,computer_name_to_index,computers,nextComputerName,setNextComputerName,videogame_list}:AddPlayerFormProps) {
     const [ID, setID] = useState<string>("");
-    const [videogame, setVideogame] = useState<string>("Other");
+    const [videogame_name, setVideogame] = useState<string>("Other");
     const [computer_name, setComputerName] = useState<string|null>(null);
     const [errorMessage, setErrorMessage] = useState<string>("");
     function handleSubmit(e:any) {
         e.preventDefault()
-        add_player(ID,videogame,computer_name_to_index(computer_name || nextComputerName));
+        add_player(ID,videogame_name,computer_name_to_index(computer_name || nextComputerName));
         setComputerName(null);
         setNextComputerName(default_computer_name(computer_name || nextComputerName));
         setVideogame("Other");
@@ -26,9 +24,9 @@ export default function AddPlayerForm({add_player,default_computer_name,computer
                         <input type="text" value={ID} onChange={(e) => setID(e.target.value)}/>
                     </label><br/>
                     <label>Game:<br/>
-                        <select value={videogame} onChange={(e) => setVideogame(e.target.value)}>
+                        <select value={videogame_name} onChange={(e) => setVideogame(e.target.value)}>
                             {videogame_list.map((vg) => 
-                                <option value={vg}>{vg}</option>
+                                <option value={vg.name}>{vg.name}</option>
                             )}
                             <option value={"Other"}>Other</option>
                         </select>
