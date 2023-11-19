@@ -17,11 +17,11 @@ export default function ComputerIcon({index, computer,remove_player_from_compute
     }
     setInterval(updateTimeLeft,1000/MULTIPLIER);
     function secondsToTimerString(ms:number):string {
-        let hours = (Math.abs(ms/3600_000-0.5)).toFixed(0);
+        let hours = (Math.min(0,ms/3600_000-0.5)).toFixed(0);
         ms %= 3600_000
-        let minutes = (Math.abs(ms/60_000-0.5)).toFixed(0);
+        let minutes = (Math.min(0,ms/60_000-0.5)).toFixed(0);
         ms %= 60_000
-        let seconds = (Math.abs(ms/1000-0.5)).toFixed(0);
+        let seconds = (Math.min(0,ms/1000-0.5)).toFixed(0);
         while(minutes.length < 2) minutes = "0"+minutes;
         while(seconds.length < 2) seconds = "0"+seconds;
         let to_return = hours+":"+minutes+":"+seconds;

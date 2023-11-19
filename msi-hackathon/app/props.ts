@@ -21,6 +21,7 @@ export type SidebarProps = {
     nextComputerName: string;
     setNextComputerName: Function;
     videogame_list: videogame[];
+    setQueue: Function;
 }
 export type PlayerQueueProps = {
     queue: Player[];
@@ -32,8 +33,10 @@ export type PlayerQueueProps = {
     computers: Computer[];
     nextComputerName: string;
     setNextComputerName: Function;
+    setQueue: Function;
 }
 export type PlayerInQueueProps = {
+    change:Function;
     idx: number;
     player: Player;
     remove_player_from_queue: Function;
