@@ -4,7 +4,7 @@ export default function PlayerInQueue({idx,player,remove_player_from_queue}:Play
     return (
         <div key={idx}>
             #{idx+1} {player.ID} {player.videogame}&emsp;
-            <button onClick={() => remove_player_from_queue(idx)}>X</button>
+            <button onClick={() => remove_player_from_queue(idx)} style={{minWidth:"1.7vw", fontSize:"1.5vh"}}><p>X</p></button>
         </div>
     )
 }

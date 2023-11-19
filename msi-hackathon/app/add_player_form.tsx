@@ -11,11 +11,10 @@ export default function AddPlayerForm({add_player,default_computer_name,computer
     function handleSubmit(e:any) {
         e.preventDefault()
         add_player(ID,videogame,computer_name_to_index(computer_name));
-        e.target.reset();
     }
     return (
-        <div className='add_player_form'>
-            <h1>
+        <div className='add_player_form sub_section'>
+            <div>
                 Add Player
                 <form onSubmit={handleSubmit}>
                     <label>PID:<br/>
@@ -36,10 +35,10 @@ export default function AddPlayerForm({add_player,default_computer_name,computer
                             )}
                         </select>
                     </label><br/>
-                    <input type='submit'/>
+                    <button onClick={handleSubmit}><p>Add Player</p></button>
                 </form>
                 {/* <h2 className='errorMessage'>{errorMessage}</h2> */}
-            </h1>
+            </div>
         </div>
     )
 }

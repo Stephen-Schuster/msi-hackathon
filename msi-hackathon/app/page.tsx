@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Sidebar from './sidebar';
 import { Computer, Player } from '@/types';
 import ComputerField from './computer_field';
+import CustomAlertDialog from './custom_alert';
 
 const NUM_COMPUTERS = 24;
 
@@ -10,6 +11,7 @@ export default function Home() {
 
   const [computers, setComputers] = useState<Computer[]>(default_computer_list());
   const [queue, setQueue] = useState<Player[]>([]);
+  const [alerts,setAlerts] = useState<string[]>([]);
 
   function default_computer_list(): Computer[] {
     let computers = [];
@@ -60,7 +62,7 @@ export default function Home() {
   }
   function move_player_from_computer_to_queue(computer_number: number) {
     if (computers[computer_number].curr_player == null) {
-      alert("No Player there!");
+      throw Error("No Player there!");
     } else {
       let player: Player = computers[computer_number].curr_player!;
       remove_player_from_computer(computer_number);
@@ -69,7 +71,7 @@ export default function Home() {
   }
   function remove_player_from_computer(computer_number: number) {
     if (computers[computer_number].curr_player == null) {
-      alert("No Player there!");
+      throw Error("No Player there!");
     } else {
       let new_computers = computers.slice();
       new_computers[computer_number].curr_player = null;
@@ -122,12 +124,41 @@ export default function Home() {
     setQueue(new_queue);
     return to_return;
   }
+  function close_alert() {
+    let new_alerts = alerts.slice(1);
+    setAlerts(new_alerts);
+  }
+  function add_alert(msg:string) {
+      let new_new_alerts = alerts.slice();
+      new_new_alerts.push(msg);
+      setAlerts(new_new_alerts);
+  }
+  function snooze_alert() {
+    let old_alert = alerts[0];
+    let new_alerts = alerts.slice(1);
+    setAlerts(new_alerts);
+    setTimeout(() =>{
+      add_alert(old_alert)
+    },10_000);
+  }
+
+  console.log(alerts.length)
 
   console.log(computers)
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
       <div className="wrapper">
-        <header>HEADER</header>
+        <CustomAlertDialog
+          message={alerts[0]}
+          open={alerts.length > 0}
+          onClose={close_alert}
+          onSnooze={snooze_alert}
+        />
+        <header className='sub_section'>
+          <div>
+            <button onClick={() => setAlerts(["Test!","TEST TWO"])}><p>Test Alert</p></button>
+          </div>
+        </header>
         <nav>
           <Sidebar add_player={add_player} queue={queue} pop_player_from_queue={pop_player_from_queue} default_computer_name={default_computer_name} computer_name_to_index={computer_name_to_index} computer_names={computer_names} remove_player_from_queue={remove_player_from_queue}/>
         </nav>
