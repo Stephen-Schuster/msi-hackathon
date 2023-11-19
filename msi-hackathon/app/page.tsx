@@ -78,6 +78,7 @@ export default function Home() {
       let new_queue = queue.slice();
       new_queue.push(to_add);
       setQueue(new_queue);
+      check_queue_alert()
     }
   }
   function move_player_from_computer_to_queue(computer_number: number) {
@@ -105,6 +106,7 @@ export default function Home() {
             queue_player.play_start_time = new Date().getTime();
             new_computers[computer_number].curr_player = queue_player;
             setQueue(new_queue);
+            check_queue_alert()
             setComputers(new_computers);
           },()=>{}]
         })
@@ -113,6 +115,18 @@ export default function Home() {
         remove_player_from_computer(computer_number);
         add_player(player.ID, player.videogame.name);
       }
+    }
+  }
+  function timeLeft(comp:Computer):number {
+    let time_playing = new Date().getTime() - comp.curr_player!.play_start_time!;
+    let time_to_get_off = minimum_time - comp.curr_player!.videogame.leadout_time;
+    return time_to_get_off-time_playing;
+  }
+  function check_queue_alert() {
+    let computers_by_time_left = computers.filter((a)=>a.curr_player != null);
+    computers_by_time_left.sort((a,b)=>timeLeft(a)-timeLeft(b));
+    if(computers_by_time_left.length > queue.length && timeLeft(computers_by_time_left[queue.length]) < 0) {
+      make_alert("Tell Player "+computers_by_time_left[queue.length].curr_player!.ID+" on computer "+computers_by_time_left[queue.length].name+" its their last game");
     }
   }
   function remove_player_from_computer(computer_number: number) {
@@ -202,6 +216,28 @@ export default function Home() {
       callbacks: [()=>snooze_alert(message),()=>{}]
     });
   }
+
+  function update_warnings() {
+    let num_over = 0;
+    for(let i = 0; i<computers.length; i++) {
+      if(computers[i].curr_player == null) continue;
+      let time_playing = new Date().getTime() - computers[i].curr_player!.play_start_time!;
+      let time_to_get_off = minimum_time - computers[i].curr_player!.videogame.leadout_time;
+      if(time_playing>time_to_get_off) num_over ++;
+    }
+    if(queue.length > num_over) {
+      for(let i = 0; i<computers.length; i++) {
+        if(computers[i].curr_player == null) continue;
+        let time_playing = new Date().getTime() - computers[i].curr_player!.play_start_time!;
+        let time_to_get_off = minimum_time - computers[i].curr_player!.videogame.leadout_time;
+        if(time_to_get_off>=time_playing && time_playing>=time_to_get_off-1000) {
+          make_alert("Tell Player "+computers[i].curr_player!.ID+" on computer "+computers[i].name+" its their last game");
+        }
+      }
+    }
+  }
+
+  setInterval(update_warnings,1000)
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
