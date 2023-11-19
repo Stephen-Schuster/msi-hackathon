@@ -11,3 +11,8 @@ export type Player = {
     videogame: string;
     ID: string;
 }
+export type question = {
+    message: string;
+    options: string[];
+    callbacks: Function[];
+}

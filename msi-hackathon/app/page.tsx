@@ -1,9 +1,9 @@
 "use client";
 import React, { useState } from 'react';
 import Sidebar from './sidebar';
-import { Computer, Player } from '@/types';
+import { Computer, Player, question } from '@/types';
 import ComputerField from './computer_field';
-import CustomAlertDialog from './custom_alert';
+import CustomQuestionDialog from './custom_question';
 
 const NUM_COMPUTERS = 24;
 
@@ -11,7 +11,8 @@ export default function Home() {
 
   const [computers, setComputers] = useState<Computer[]>(default_computer_list());
   const [queue, setQueue] = useState<Player[]>([]);
-  const [alerts,setAlerts] = useState<string[]>([]);
+  const [questions,setQuestions] = useState<question[]>([]);
+  const [curr_question,setCurrQuestion] = useState<question|undefined>(undefined);
 
   function default_computer_list(): Computer[] {
     let computers = [];
@@ -124,39 +125,44 @@ export default function Home() {
     setQueue(new_queue);
     return to_return;
   }
-  function close_alert() {
-    let new_alerts = alerts.slice(1);
-    setAlerts(new_alerts);
+  function close2_question() {
+    let new_questions = questions.slice(1);
+    setQuestions(new_questions);
   }
-  function add_alert(msg:string) {
-      let new_new_alerts = alerts.slice();
-      new_new_alerts.push(msg);
-      setAlerts(new_new_alerts);
+  function close1_question() {
+    setCurrQuestion(questions[1]);
   }
-  function snooze_alert() {
-    let old_alert = alerts[0];
-    let new_alerts = alerts.slice(1);
-    setAlerts(new_alerts);
+  function add_question(q:question) {
+      let new_new_questions = questions.slice();
+      new_new_questions.push(q);
+      setQuestions(new_new_questions);
+      if(new_new_questions.length == 1) setCurrQuestion(new_new_questions[0]);
+  }
+  function snooze_alert(message:string) {
     setTimeout(() =>{
-      add_alert(old_alert)
+      add_question(make_alert(message))
     },10_000);
   }
+  function make_alert(message: string):question {
+    return {
+      message,
+      options: ['Snooze 60s','OK'],
+      callbacks: [()=>snooze_alert(message),()=>{}]
+    }
+  }
 
-  console.log(alerts.length)
-
-  console.log(computers)
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
       <div className="wrapper">
-        <CustomAlertDialog
-          message={alerts[0]}
-          open={alerts.length > 0}
-          onClose={close_alert}
-          onSnooze={snooze_alert}
+        <CustomQuestionDialog
+          q={questions[0]}
+          open={questions.length > 0 && questions[0] == curr_question}
+          onClose1={close1_question}
+          onClose2={close2_question}
         />
         <header className='sub_section'>
           <div>
-            <button onClick={() => setAlerts(["Test!","TEST TWO"])}><p>Test Alert</p></button>
+            <button onClick={() => {add_question(make_alert('TEST'))}}><p>Test Question</p></button>
           </div>
         </header>
         <nav>

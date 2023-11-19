@@ -216,7 +216,7 @@ button p {
   opacity: 1;
 }
 
-.custom-alert {
+.custom-question {
   position: fixed;
   top: -100%;
   left: 50%;
@@ -227,7 +227,7 @@ button p {
   z-index: 1001;
 }
 
-.custom-alert.slide-in {
+.custom-question.slide-in {
   top: 40%;
   opacity: 1;
 }
