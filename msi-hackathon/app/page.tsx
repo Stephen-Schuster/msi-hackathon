@@ -74,18 +74,59 @@ export default function Home() {
     if (computers[computer_number].curr_player == null) {
       throw Error("No Player there!");
     } else {
-      let player: Player = computers[computer_number].curr_player!;
-      remove_player_from_computer(computer_number);
-      add_player(player.ID, player.videogame);
+      if(queue.length > 0) {
+        add_question({
+          message: "Place Player "+queue[0].ID+" on computer "+computers[computer_number].name+"?",
+          options: ["Yes","No"],
+          callbacks: [() =>{
+            let new_computers = computers.slice();
+            let new_queue = queue.slice();
+            let queue_player = new_queue.splice(0,1)[0]
+            let computer_player: Player = computers[computer_number].curr_player!;
+            let to_add: Player = {
+              play_start_time: null,
+              queue_start_time: new Date().getTime(),
+              computer_number: computer_number,
+              videogame: computer_player.videogame,
+              ID: computer_player.ID
+            };
+            new_queue.push(to_add);
+            queue_player.computer_number = computer_number;
+            queue_player.play_start_time = new Date().getTime();
+            new_computers[computer_number].curr_player = queue_player;
+            setQueue(new_queue);
+            setComputers(new_computers);
+          },()=>{}]
+        })
+      } else {
+        let player: Player = computers[computer_number].curr_player!;
+        remove_player_from_computer(computer_number);
+        add_player(player.ID, player.videogame);
+      }
     }
   }
   function remove_player_from_computer(computer_number: number) {
     if (computers[computer_number].curr_player == null) {
       throw Error("No Player there!");
     } else {
-      let new_computers = computers.slice();
-      new_computers[computer_number].curr_player = null;
-      setComputers(new_computers);
+      if(queue.length > 0) {
+        add_question({
+          message: "Place Player "+queue[0].ID+" on computer "+computers[computer_number].name+"?",
+          options: ["Yes","No"],
+          callbacks: [() =>{
+            let new_computers = computers.slice();
+            let player: Player = remove_player_from_queue(0);
+            player.computer_number = computer_number;
+            player.play_start_time = new Date().getTime();
+            new_computers[computer_number].curr_player = player;
+            setComputers(new_computers);
+          },()=>{}]
+        })
+      } else {
+        let new_computers = computers.slice();
+        new_computers[computer_number].curr_player = null;
+        setComputers(new_computers);
+      }
     }
   }
   function available_computer(): number | null {
