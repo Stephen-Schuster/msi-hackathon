@@ -10,6 +10,7 @@ const NUM_COMPUTERS = 24;
 export default function Home() {
 
   const [computers, setComputers] = useState<Computer[]>(default_computer_list());
+  const [next_computer_name, setNextComputerName] = useState<string>(default_computer_name());
   const [queue, setQueue] = useState<Player[]>([]);
   const [questions,setQuestions] = useState<question[]>([]);
   const [curr_question,setCurrQuestion] = useState<question|undefined>(undefined);
@@ -112,18 +113,18 @@ export default function Home() {
     }
     throw Error("name does not exist")
   }
-  function default_computer_name(): string {
-    let names = computer_names();
+  function default_computer_name(excluding:string|null = null): string {
+    let names = computer_names(excluding);
     if (names.length > 1) {
       return names[1]!;
     } else {
       return "Queue";
     }
   }
-  function computer_names(): string[] {
+  function computer_names(excluding:string|null = null): string[] {
     let to_return: string[] = ["Queue"];
     for (let i = 0; i < computers.length; i++) {
-      if (computers[i].curr_player == null) to_return.push(computers[i].name);
+      if (computers[i].curr_player == null && computers[i].name != excluding) to_return.push(computers[i].name);
     }
     return to_return
   }
@@ -174,7 +175,7 @@ export default function Home() {
           </div>
         </header>
         <nav>
-          <Sidebar add_player={add_player} queue={queue} pop_player_from_queue={pop_player_from_queue} default_computer_name={default_computer_name} computer_name_to_index={computer_name_to_index} computer_names={computer_names} remove_player_from_queue={remove_player_from_queue}/>
+          <Sidebar computers={computers} add_player={add_player} queue={queue} pop_player_from_queue={pop_player_from_queue} default_computer_name={default_computer_name} computer_name_to_index={computer_name_to_index} computer_names={computer_names} remove_player_from_queue={remove_player_from_queue} setNextComputerName={setNextComputerName} nextComputerName={next_computer_name}/>
         </nav>
         <section>
           <ComputerField computers={computers} remove_player_from_computer={remove_player_from_computer} move_player_from_computer_to_queue={move_player_from_computer_to_queue}/>

@@ -4,7 +4,9 @@ export type AddPlayerFormProps = {
     add_player:Function;
     default_computer_name: Function;
     computer_name_to_index: Function;
-    computer_names: Function;
+    computers: Computer[];
+    nextComputerName: string;
+    setNextComputerName: Function;
 }
 export type SidebarProps = {
     add_player:Function;
@@ -14,6 +16,9 @@ export type SidebarProps = {
     computer_name_to_index: Function;
     computer_names: Function;
     remove_player_from_queue: Function;
+    computers: Computer[];
+    nextComputerName: string;
+    setNextComputerName: Function;
 }
 export type PlayerQueueProps = {
     queue: Player[];
@@ -22,6 +27,9 @@ export type PlayerQueueProps = {
     computer_name_to_index: Function;
     computer_names: Function;
     remove_player_from_queue: Function;
+    computers: Computer[];
+    nextComputerName: string;
+    setNextComputerName: Function;
 }
 export type PlayerInQueueProps = {
     idx: number;

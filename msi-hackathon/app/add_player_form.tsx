@@ -1,16 +1,21 @@
+import { Computer } from '@/types';
 import { AddPlayerFormProps } from './props';
 
 const videogame_list = ["Overwatch","League of Legends","Valorant","Fortnite","Hearthstone","Apex Legends","Rocket League"]
 
 import React, { useState } from 'react';
-export default function AddPlayerForm({add_player,default_computer_name,computer_name_to_index,computer_names}:AddPlayerFormProps) {
+export default function AddPlayerForm({add_player,default_computer_name,computer_name_to_index,computers,nextComputerName,setNextComputerName}:AddPlayerFormProps) {
     const [ID, setID] = useState<string>("");
     const [videogame, setVideogame] = useState<string>("Other");
-    const [computer_name, setComputerName] = useState<string>(default_computer_name());
+    const [computer_name, setComputerName] = useState<string|null>(null);
     const [errorMessage, setErrorMessage] = useState<string>("");
     function handleSubmit(e:any) {
         e.preventDefault()
-        add_player(ID,videogame,computer_name_to_index(computer_name));
+        add_player(ID,videogame,computer_name_to_index(computer_name || nextComputerName));
+        setComputerName(null);
+        setNextComputerName(default_computer_name(computer_name || nextComputerName));
+        setVideogame("Other");
+        setID("");
     }
     return (
         <div className='add_player_form sub_section'>
@@ -29,9 +34,10 @@ export default function AddPlayerForm({add_player,default_computer_name,computer
                         </select>
                     </label><br/>
                     <label>Computer:<br/>
-                        <select value={computer_name} onChange={(e) => setComputerName(e.target.value)}>
-                            {computer_names().map((name:string) => 
-                                <option value={name}>{name}</option>
+                        <select value={computer_name || nextComputerName} onChange={(e) => setComputerName(e.target.value)}>
+                            <option value={"Queue"}>{"Queue"}</option>
+                            {computers.map((computer:Computer) => 
+                                <option value={computer.name} hidden={computer.curr_player != null}>{computer.name}</option>
                             )}
                         </select>
                     </label><br/>
