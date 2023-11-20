@@ -46,7 +46,8 @@ export type ComputerFieldProps = {
     computers:Computer[];
     remove_player_from_computer: Function;
     move_player_from_computer_to_queue: Function;
-    make_alert: Function
+    make_alert: Function;
+    layoutBG: string|null;
 }
 export type ComputerIconProps = {
     minimum_time:number;

@@ -36,7 +36,8 @@ main {
 }
 
 header {
-	width: 100%;
+  min-width: 81vw;
+  max-width: 81vw;
   height: 10vh;
 }
 
@@ -45,12 +46,14 @@ nav, section {
   height: 80vh;
 }
 section {
-  max-width: 75vw;
+  max-width: 60vw;
+  min-width: 60vw;
 }
 
 nav {
-  width: 25vw;
-  margin-right: 10px;
+  max-width: 20vw;
+  min-width: 20vw;
+  margin-right: 1vw;
 }
 
 *, *:before, *:after {
@@ -154,7 +157,7 @@ button p {
 }
 .remove {
   position: absolute;
-  transform: translate(100%,-150%);
+  transform: translate(150%,-150%);
   font-size: 0.5vw;
   height: 1.5vw;
   width: 1.5vw;
@@ -164,7 +167,7 @@ button p {
 }
 .requeue {
   position: absolute;
-  transform: translate(100%,0%);
+  transform: translate(150%,0%);
   font-size: 0.5vw;
   height: 1.5vw;
   width: 1.5vw;
@@ -237,4 +240,26 @@ button p {
 
 button:hover {
   background-color: #0056b3;
+}
+
+button:disabled {
+    padding: 5px 5px;
+    border: 0;
+    position: relative;
+    overflow: hidden;
+    transition: color 0.4s ease-in-out;
+    background: linear-gradient(-45deg, #9A75A3,#bF9080);
+    -webkit-background-clip: text;
+    background: linear-gradient(-45deg, #9A75A3,#bF9080);
+    border-radius: 50lh;
+}
+button:disabled p {
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    background-color: #2f3f4f;
+    color: grey;
+    border-radius: 50lh;
+    font-weight: bold;
 }

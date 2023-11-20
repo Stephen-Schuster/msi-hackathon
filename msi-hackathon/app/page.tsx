@@ -5,6 +5,8 @@ import { Computer, Player, question, videogame } from '@/types';
 import ComputerField from './computer_field';
 import CustomQuestionDialog from './custom_question';
 import get_time, { MULTIPLIER } from './get_time';
+import gear_icon from '../images/settings.png';
+import logs_icon from '../images/logs.png';
 
 const NUM_COMPUTERS = 24;
 
@@ -14,7 +16,8 @@ export default function Home() {
   const [next_computer_name, setNextComputerName] = useState<string>(default_computer_name());
   const [queue, setQueue] = useState<Player[]>([]);
   const [questions,setQuestions] = useState<question[]>([]);
-  const [minimum_time, setMinimumTime] = useState<number>(25_000);
+  const [minimum_time, setMinimumTime] = useState<number>(3600_000);
+  const [snoozeTime, setSnoozeTime] = useState<number>(60_000);
   const [videogame_list, setVideogameList] = useState<videogame[]>([
     {name: "Overwatch", leadout_time:10*60_000},
     {name: "League of Legends", leadout_time:20*60_000},
@@ -26,17 +29,18 @@ export default function Home() {
     {name: "Other", leadout_time:10*60_000}
   ]);
   const [questionFadingOut, setQuestionFadingOut] = useState<boolean>(false);
-  const [lastGameWarnings, setLastGameWarnings] = useState<(number | null)[]>(Array(NUM_COMPUTERS).fill(null))
+  const [showSettings, setShowSetting] = useState<boolean>(false);
+  const [layoutBG,setLayoutBG] = useState<string|null>(null);
 
   function default_computer_list(): Computer[] {
     let computers = [];
     for (let i = 0; i < NUM_COMPUTERS; i++) {
       let name = String.fromCharCode(65 + Math.floor(i/5))+(i%5+1);
-      let x = 100.0/8 * (i%5+1);
-      let y = 100 - 100.0/5 * (Math.floor(i/5)+1);
+      let x = 1000.0/8 * (i%5+1);
+      let y = 1000 - 1000.0/5 * (Math.floor(i/5)+1);
       if(i>=20) {
-        x = 100.0*7/8;
-        y = 100.0/5 * (i-19);
+        x = 1000.0*7/8;
+        y = 1000.0/5 * (i-19);
       }
       computers.push({
         curr_player: null,
@@ -217,12 +221,12 @@ export default function Home() {
   function snooze_alert(message:string) {
     setTimeout(() =>{
       make_alert(message);
-    },10_000);
+    },snoozeTime);
   }
   function make_alert(message: string) {
     add_question({
       message,
-      options: ['Snooze 60s','OK'],
+      options: ['Snooze '+(snoozeTime/1000)+'s','OK'],
       callbacks: [()=>snooze_alert(message),()=>{}]
     });
   }
@@ -249,6 +253,69 @@ export default function Home() {
 
   setInterval(update_warnings,1000/MULTIPLIER)
 
+  function update_game_name(idx:number,name:string) {
+    let vgs = videogame_list.slice();
+    vgs[idx].name = name;
+    setVideogameList(vgs);
+  }
+  function update_lead_time(idx:number,input:string) {
+    let vgs = videogame_list.slice();
+    if(input=="") input = "0";
+    let num = parseInt(input)
+    vgs[idx].leadout_time = 60_000*num
+    setVideogameList(vgs);
+  }
+  function remove_game(idx:number) {
+    let vgs = videogame_list.slice();
+    vgs.splice(idx,1);
+    setVideogameList(vgs)
+  }
+  function add_game() {
+    let vgs = videogame_list.slice();
+    let to_add:videogame = {
+      name: "???",
+      leadout_time: vgs[vgs.length-1].leadout_time
+    }
+    vgs.splice(vgs.length-1,0,to_add);
+    setVideogameList(vgs)
+  }
+  function change_comp_name(idx:number,name:string) {
+    let comps = computers.slice()
+    comps[idx].name = name;
+    setComputers(comps);
+  }
+  function change_Y(idx:number,input:string) {
+    let comps = computers.slice()
+    if(input=="") input="0"
+    let num = parseFloat(input)
+    comps[idx].y = num
+    setComputers(comps);
+  }
+  function change_X(idx:number,input:string) {
+    let comps = computers.slice()
+    if(input=="") input="0"
+    let num = parseFloat(input)
+    comps[idx].x = num
+    setComputers(comps);
+  }
+  function add_computer() {
+    let comps = computers.slice();
+    comps.push({
+      curr_player: null,
+      x: 500,
+      y: 500,
+      name: "???"
+    })
+    setComputers(comps)
+  }
+
+  const onImageChange = (event:any) => {
+    if (event.target.files && event.target.files[0]) {
+      let img = event.target.files[0];
+      setLayoutBG(URL.createObjectURL(img));
+    }
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
       <div className="wrapper">
@@ -261,15 +328,75 @@ export default function Home() {
         />
         <header className='sub_section'>
          <div>
-            <button onClick={() => {make_alert('TEST')}}><p>Test Question</p></button>
+          <p style={{fontSize:"5vh"}}>
+            TEC GAMER MANAGEMENT
+            <button onClick={()=>setShowSetting(!showSettings)} style={{maxHeight:"7vh",float:"right",marginTop:"1vh",marginRight:"3vw"}}><img src={gear_icon.src} style={{maxHeight:"6vh"}}></img></button>
+          </p>
           </div>
         </header>
+        {
+          showSettings?
+          <div className='sub_section'>
+            <div>
+                Minimum Play Time: &emsp;
+                <input style={{maxWidth:"3vw",marginTop:"3vw"}} value={minimum_time/60_000} type='text' onChange={(e)=>{if(e.target.value!="")setMinimumTime(parseInt(e.target.value)*60_000);else setMinimumTime(0)}}></input>&emsp;
+                minutes
+                <br/>
+                <br/>
+                Snooze Time: &emsp;
+                <input style={{maxWidth:"3vw"}} value={snoozeTime/1_000} type='text' onChange={(e)=>{if(e.target.value!="")setSnoozeTime(parseInt(e.target.value)*1_000);else setSnoozeTime(0)}}></input>&emsp;
+                seconds
+                <br/>
+                <br/>
+                Layout Background: &emsp;
+                <input style={{maxWidth:"5vw",fontSize:"1.25vh"}} type='file' onChange={onImageChange}></input>&emsp;
+                <br/>
+                <br/>
+              {videogame_list.map((vg,idx)=>
+              <>
+                Game name: &emsp;
+                <input value={vg.name} type='text' onChange={(e)=>update_game_name(idx,e.target.value)}></input>&emsp;
+                Last Game Warning Time: &emsp;
+                <input style={{maxWidth:"3vw"}} value={(vg.leadout_time/60_000).toFixed(0)} type='text' onChange={(e)=>update_lead_time(idx,e.target.value)}></input> minutes &emsp;
+                <button disabled={idx == videogame_list.length-1} onClick={() => remove_game(idx)} style={{minWidth:"1.7vw", fontSize:"1.5vh"}}><p>X</p></button>
+                <br/>
+                <br/>
+              </>
+              )}
+              <button onClick={() => add_game()} style={{minWidth:"1.7vw", fontSize:"1.5vh"}}><p>+</p></button>
+                <br/>
+                <br/>
+              {computers.map((comp,idx)=><>
+                Computer Name: 
+                &emsp;
+                <input style={{maxWidth:"3vw"}} value={comp.name} onChange={(e)=>change_comp_name(idx,e.target.value)} type='text'></input>
+                &emsp;
+                X:
+                &emsp;
+                <input style={{maxWidth:"3vw"}} value={comp.x} onChange={(e)=>change_X(idx,e.target.value)} type='text'></input>
+                &emsp;
+                Y:
+                &emsp;
+                <input style={{maxWidth:"3vw"}} value={comp.y} onChange={(e)=>change_Y(idx,e.target.value)} type='text'></input>
+                &emsp;
+                <br/>
+                <br/>
+              </>)}
+              <button onClick={() => add_computer()} style={{minWidth:"1.7vw", fontSize:"1.5vh"}}><p>+</p></button>
+                <br/>
+                <br/>
+            </div>
+          </div>
+          :
+          <>
         <nav>
-          <Sidebar computers={computers} add_player={add_player} queue={queue} pop_player_from_queue={pop_player_from_queue} default_computer_name={default_computer_name} computer_name_to_index={computer_name_to_index} computer_names={computer_names} remove_player_from_queue={remove_player_from_queue} setNextComputerName={setNextComputerName} nextComputerName={next_computer_name} videogame_list={videogame_list} setQueue={setQueue}/>
+          <Sidebar  computers={computers} add_player={add_player} queue={queue} pop_player_from_queue={pop_player_from_queue} default_computer_name={default_computer_name} computer_name_to_index={computer_name_to_index} computer_names={computer_names} remove_player_from_queue={remove_player_from_queue} setNextComputerName={setNextComputerName} nextComputerName={next_computer_name} videogame_list={videogame_list} setQueue={setQueue}/>
         </nav>
         <section>
-          <ComputerField computers={computers} remove_player_from_computer={remove_player_from_computer} move_player_from_computer_to_queue={move_player_from_computer_to_queue} make_alert={make_alert} minimum_time={minimum_time}/>
+            <ComputerField layoutBG={layoutBG} computers={computers} remove_player_from_computer={remove_player_from_computer} move_player_from_computer_to_queue={move_player_from_computer_to_queue} make_alert={make_alert} minimum_time={minimum_time}/>
         </section>
+          </>
+        }
       </div>
     </main>
   )
