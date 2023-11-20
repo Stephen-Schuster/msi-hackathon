@@ -7,6 +7,7 @@ import CustomQuestionDialog from './custom_question';
 import get_time, { MULTIPLIER } from './get_time';
 import gear_icon from '../images/settings.png';
 import logs_icon from '../images/logs.png';
+import monitor_icon from '../images/monitor.png';
 
 const NUM_COMPUTERS = 24;
 
@@ -29,8 +30,9 @@ export default function Home() {
     {name: "Other", leadout_time:10*60_000}
   ]);
   const [questionFadingOut, setQuestionFadingOut] = useState<boolean>(false);
-  const [showSettings, setShowSetting] = useState<boolean>(false);
+  const [page, setPage] = useState<number>(0);
   const [layoutBG,setLayoutBG] = useState<string|null>(null);
+  const [logs, setLogs] = useState<string[]>([]);
 
   function default_computer_list(): Computer[] {
     let computers = [];
@@ -76,6 +78,7 @@ export default function Home() {
       ID: ID,
     };
     if (computer_number != null) {
+      addLog("Player "+ID+" playing "+videogame_name+" added to computer "+computers[computer_number].name.toString());
       if (computers[computer_number].curr_player == null) {
         force_add_player(to_add,computer_number)
       } else {
@@ -88,6 +91,7 @@ export default function Home() {
         });
       }
     } else {
+      addLog("Player "+ID+" playing "+videogame_name+" added to queue");
       console.log(to_add);
       let new_queue = queue.slice();
       new_queue.push(to_add);
@@ -122,12 +126,14 @@ export default function Home() {
             setQueue(new_queue);
             check_queue_alert()
             setComputers(new_computers);
+            addLog("Player "+computer_player.ID+" put back in queue and replaced with "+queue_player.ID+" on computer "+computers[computer_number].name)
           },()=>{}]
         })
       } else {
         let player: Player = computers[computer_number].curr_player!;
         remove_player_from_computer(computer_number);
         add_player(player.ID, player.videogame.name);
+        addLog("Player "+player.ID+" put back in queue from computer "+computers[computer_number].name)
       }
     }
   }
@@ -158,12 +164,14 @@ export default function Home() {
             player.play_start_time = get_time();
             new_computers[computer_number].curr_player = player;
             setComputers(new_computers);
+            addLog("Player "+computers[computer_number].curr_player!.ID+" replaced with "+player.ID+" on computer "+computers[computer_number].name)
           },()=>{}]
         })
       } else {
         let new_computers = computers.slice();
         new_computers[computer_number].curr_player = null;
         setComputers(new_computers);
+        addLog("Player "+computers[computer_number].curr_player!.ID+" removed from computer "+computers[computer_number].name)
       }
     }
   }
@@ -183,6 +191,7 @@ export default function Home() {
     player.play_start_time = get_time();
     new_computers[computer_number].curr_player = player;
     setComputers(new_computers);
+    addLog("Player "+player.ID+" moved from queue to computer "+new_computers[computer_number].name)
     return true;
   }
   function computer_name_to_index(name: string): number | null {
@@ -208,6 +217,7 @@ export default function Home() {
     return to_return
   }
   function remove_player_from_queue(index:number): Player {
+    addLog('Player '+queue[index].ID+" removed from queue")
     let new_queue = queue.slice();
     let to_return = new_queue.splice(index,1)[0]
     setQueue(new_queue);
@@ -315,6 +325,11 @@ export default function Home() {
       setLayoutBG(URL.createObjectURL(img));
     }
   };
+  function addLog(log:string) {
+    let new_logs = logs.slice()
+    new_logs.push(new Date().toString()+": "+log)
+    setLogs(new_logs);
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
@@ -330,12 +345,14 @@ export default function Home() {
          <div>
           <p style={{fontSize:"5vh"}}>
             TEC GAMER MANAGEMENT
-            <button onClick={()=>setShowSetting(!showSettings)} style={{maxHeight:"7vh",float:"right",marginTop:"1vh",marginRight:"3vw"}}><img src={gear_icon.src} style={{maxHeight:"6vh"}}></img></button>
+            <button onClick={()=>setPage(0)} style={{maxHeight:"7vh",minHeight:"7vh",minWidth:"7vh",float:"right",marginTop:"1vh",marginRight:"1vw",paddingLeft:"0.4vw"}}><img src={monitor_icon.src} style={{maxHeight:"5.5vh"}}></img></button>
+            <button onClick={()=>setPage(1)} style={{maxHeight:"7vh",float:"right",marginTop:"1vh",marginRight:"1vw"}}><img src={gear_icon.src} style={{maxHeight:"6vh"}}></img></button>
+            <button onClick={()=>setPage(2)} style={{maxHeight:"7vh",minHeight:"7vh",minWidth:"7vh",float:"right",marginTop:"1vh",marginRight:"1vw"}}><img src={logs_icon.src} style={{maxHeight:"5vh"}}></img></button>
           </p>
           </div>
         </header>
         {
-          showSettings?
+          page == 1?
           <div className='sub_section'>
             <div>
                 Minimum Play Time: &emsp;
@@ -387,7 +404,7 @@ export default function Home() {
                 <br/>
             </div>
           </div>
-          :
+          : page == 0?
           <>
         <nav>
           <Sidebar  computers={computers} add_player={add_player} queue={queue} pop_player_from_queue={pop_player_from_queue} default_computer_name={default_computer_name} computer_name_to_index={computer_name_to_index} computer_names={computer_names} remove_player_from_queue={remove_player_from_queue} setNextComputerName={setNextComputerName} nextComputerName={next_computer_name} videogame_list={videogame_list} setQueue={setQueue}/>
@@ -396,6 +413,12 @@ export default function Home() {
             <ComputerField layoutBG={layoutBG} computers={computers} remove_player_from_computer={remove_player_from_computer} move_player_from_computer_to_queue={move_player_from_computer_to_queue} make_alert={make_alert} minimum_time={minimum_time}/>
         </section>
           </>
+          :
+          <div className='sub_section'>
+            <div style={{paddingBottom:"5vw",marginTop:"1vw"}}>
+              {logs.map((log)=><p>{log}</p>)}
+            </div>
+          </div>
         }
       </div>
     </main>
