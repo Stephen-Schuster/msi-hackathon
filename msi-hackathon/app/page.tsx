@@ -112,6 +112,7 @@ export default function Home() {
             let new_queue = queue.slice();
             let queue_player = new_queue.splice(0,1)[0]
             let computer_player: Player = computers[computer_number].curr_player!;
+            addLog("Player "+computer_player.ID+" put back in queue and replaced with "+queue_player.ID+" on computer "+computers[computer_number].name)
             let to_add: Player = {
               play_start_time: null,
               queue_start_time: get_time(),
@@ -126,14 +127,13 @@ export default function Home() {
             setQueue(new_queue);
             check_queue_alert()
             setComputers(new_computers);
-            addLog("Player "+computer_player.ID+" put back in queue and replaced with "+queue_player.ID+" on computer "+computers[computer_number].name)
           },()=>{}]
         })
       } else {
         let player: Player = computers[computer_number].curr_player!;
+        addLog("Player "+player.ID+" put back in queue from computer "+computers[computer_number].name)
         remove_player_from_computer(computer_number);
         add_player(player.ID, player.videogame.name);
-        addLog("Player "+player.ID+" put back in queue from computer "+computers[computer_number].name)
       }
     }
   }
@@ -160,18 +160,18 @@ export default function Home() {
           callbacks: [() =>{
             let new_computers = computers.slice();
             let player: Player = remove_player_from_queue(0);
+            addLog("Player "+computers[computer_number].curr_player!.ID+" replaced with "+player.ID+" on computer "+computers[computer_number].name)
             player.computer_number = computer_number;
             player.play_start_time = get_time();
             new_computers[computer_number].curr_player = player;
             setComputers(new_computers);
-            addLog("Player "+computers[computer_number].curr_player!.ID+" replaced with "+player.ID+" on computer "+computers[computer_number].name)
           },()=>{}]
         })
       } else {
+        addLog("Player "+computers[computer_number].curr_player!.ID+" removed from computer "+computers[computer_number].name)
         let new_computers = computers.slice();
         new_computers[computer_number].curr_player = null;
         setComputers(new_computers);
-        addLog("Player "+computers[computer_number].curr_player!.ID+" removed from computer "+computers[computer_number].name)
       }
     }
   }
